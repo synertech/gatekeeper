@@ -41,10 +41,7 @@ public class NfcReaderHub extends Thread {
   public static NfcReaderHub getInstance() {
     
     if ( hub == null ) {
-      
       hub = new NfcReaderHub();
-      hub.start();
-      
     }
     
     return hub;
