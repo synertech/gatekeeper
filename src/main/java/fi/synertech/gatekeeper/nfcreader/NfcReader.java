@@ -58,31 +58,6 @@ public class NfcReader implements Runnable {
   }
   
   /**
-   * Liittää lukijan.
-   * 
-   * @param terminal 
-   * @return  
-   */
-  
-  public NfcReader connect( CardTerminal terminal ) {
-    
-    this.connected = true;
-    this.terminal = terminal;
-    
-    return this;
-    
-  }
-  
-  /**
-   * Irrottaa lukijan. 
-   * 
-   */
-  
-  public void disconnect() {
-    this.connected = false; 
-  }
-  
-  /**
    * Lukijan nimi.
    * 
    * @return 
@@ -126,7 +101,62 @@ public class NfcReader implements Runnable {
     
   }
   
+  /////////////////////////////////////////////////////////////////
+  ////////////////////// Protected methods ////////////////////////
+  /////////////////////////////////////////////////////////////////
   
+  /**
+   * Kertoo, onko lukija kytketty.
+   * 
+   * @return 
+   */
+  
+  protected boolean isConnected() {
+    return connected;
+  }
+  
+  /**
+   * Liittää lukijan.
+   * 
+   * @param terminal 
+   * @return  
+   */
+  
+  protected NfcReader connect( CardTerminal terminal ) {
+    
+    this.connected = true;
+    this.terminal = terminal;
+    
+    System.out.println( "laite on liitetty" );
+    
+    return this;
+    
+  }
+  
+  /**
+   * Irrottaa lukijan. 
+   * 
+   */
+  
+  protected void disconnect() {
+    
+    this.connected = false; 
+    this.terminal = null;
+    
+    System.out.println( "laite on irroitettu" );
+    
+  }
+  
+  /**
+   * Palauttaa viitteen käytössä 
+   * olevan terminaaliin.
+   * 
+   * @return 
+   */
+  
+  protected CardTerminal terminal() {
+    return terminal;
+  }
   
   
   

@@ -3,6 +3,7 @@ package fi.synertech.gatekeeper.nfcreader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.TerminalFactory;
@@ -12,10 +13,9 @@ import javax.smartcardio.TerminalFactory;
  * @author Toni Oksanen
  */
 
-public class NfcReaderHub {
+public class NfcReaderHub extends Thread {
   
   private static NfcReaderHub hub;
-  private static int terminalId = 0;
   
   private final List<NfcReader> readers;
   private final TerminalFactory factory;
@@ -48,70 +48,108 @@ public class NfcReaderHub {
   
   }
   
+  /**
+   * Liittää nfc-lukija hubiin.
+   * 
+   * @param reader 
+   */
+  
   public void connect( NfcReader reader ) {
-    
     readers.add( reader );
+  }
+  
+  /**
+   * Monitoroi liitettyjen lukijoiden tilaa. 
+   * 
+   * 
+   */
+
+  @Override
+  public void run() {
+   
+    while ( true ) {
+      
+      try {
+        
+        readers.forEach( reader -> {
+          if ( !reader.isConnected() ) {
+            getTerminal().ifPresent( terminal -> {
+              new Thread( reader.connect( terminal ) ).start();
+            });
+          } else if ( !terminalExists( reader.terminal() ) ) {
+            reader.disconnect();
+          }
+        });
+        
+        Thread.sleep( 1000L ); 
+        
+      } catch ( InterruptedException e ) {}
     
-    Thread thread = new Thread( reader.connect( getTerminal() ) );
-    thread.start();
+    }
+ 
+  }
+  
+  /**
+   * Palauttaa ensimmäisen vapaan terminaalin.
+   * 
+   * @return 
+   */
+  
+  private Optional<CardTerminal> getTerminal() {
+    
+    return terminals().stream()
+      .filter( terminal -> 
+        !isReserved( terminal ) )
+      .findFirst();
     
   }
   
-  private CardTerminal getTerminal() {
+  /**
+   * Kertoo, löytyykö terminaalia.
+   * 
+   * @param terminal
+   * @return 
+   */
+  
+  private boolean terminalExists( CardTerminal terminal ) {
+    return terminals().contains( terminal );
+  }
+  
+  /**
+   * Palauttaa terminaalit.
+   * 
+   * @return 
+   */
+  
+  private List<CardTerminal> terminals() {
     
     try {
-      
-      List<CardTerminal> terminals = factory.terminals().list();
-      
-      if ( terminals.size() > terminalId ) {
-        return terminals.get( terminalId++ );
-      }
+      return factory.terminals().list();
+    } catch ( CardException e ) {
+      return new ArrayList<>();
+    }
+  
+  }
+  
+  /**
+   * Kertoo, onko terminaali varattu.
+   * 
+   * @param terminal
+   * @return 
+   */
+  
+  private boolean isReserved( CardTerminal terminal ) {
     
-    } catch ( CardException e ) {}
-    
-    throw new RuntimeException( "" );
+    return readers.stream()
+      .map( reader -> 
+        reader.terminal() )
+      .filter( term -> 
+        term == terminal )
+      .findAny()
+      .isPresent();
     
   }
-
-  
-  
-  
-  
-  
-  
   
   
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

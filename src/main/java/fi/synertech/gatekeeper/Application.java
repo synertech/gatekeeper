@@ -15,6 +15,7 @@ public class Application {
     AccessManager accessManager = new AccessManager();
     
     NfcReaderHub readerHub = NfcReaderHub.getInstance();
+    readerHub.start();
     
     NfcReader inReader = new NfcReader( "IN_READER" );
     NfcReader outReader = new NfcReader( "OUT_READER" );
@@ -33,6 +34,7 @@ public class Application {
     outReader.onReading( event -> {
       System.out.println( "welcome again..." );
     });
+    
     
   }
   
