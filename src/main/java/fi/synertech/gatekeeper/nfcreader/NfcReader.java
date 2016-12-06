@@ -4,7 +4,6 @@ package fi.synertech.gatekeeper.nfcreader;
 import fi.synertech.gatekeeper.nfcreader.event.EventListener;
 import fi.synertech.gatekeeper.nfcreader.event.NfcReaderEvent;
 import fi.synertech.gatekeeper.nfcreader.event.RfidReadEvent;
-import static java.lang.Thread.sleep;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,6 +15,8 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import static javax.xml.bind.DatatypeConverter.parseHexBinary;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -33,6 +34,8 @@ public class NfcReader implements Runnable {
   private static final CommandAPDU READ_RFID_APDU = 
     new CommandAPDU( parseHexBinary( "FFCA000000" ) );
   
+  private static Logger logger;
+  
  /**
    * Konstruktori.
    * 
@@ -43,6 +46,10 @@ public class NfcReader implements Runnable {
     
     this.name = name;
     this.listeners = new ArrayList<>();
+    
+    if ( logger == null ) {
+      logger = LoggerFactory.getLogger( getClass() );
+    }
     
   }
   
@@ -68,7 +75,9 @@ public class NfcReader implements Runnable {
   }
   
   /**
-   * Lukee rfid:een.
+   * Monitoroi lukijan tilaa
+   * ja lukee rfid:n, jos sellainen
+   * on esitetty lukijan päällä.
    * 
    */
   
@@ -93,7 +102,7 @@ public class NfcReader implements Runnable {
           
         }
         
-        sleep( 800 );
+        Thread.sleep( 800 );
         
       } catch ( CardException | InterruptedException e ) {}
       
@@ -119,17 +128,14 @@ public class NfcReader implements Runnable {
    * Liittää lukijan.
    * 
    * @param terminal 
-   * @return  
    */
   
-  protected NfcReader connect( CardTerminal terminal ) {
+  protected void connect( CardTerminal terminal ) {
     
     this.connected = true;
     this.terminal = terminal;
     
-    System.out.println( "laite on liitetty" );
-    
-    return this;
+    logger.info( "NFC-Reader '" + name + "' has been connected." );
     
   }
   
@@ -143,7 +149,7 @@ public class NfcReader implements Runnable {
     this.connected = false; 
     this.terminal = null;
     
-    System.out.println( "laite on irroitettu" );
+    logger.info( "NFC-Reader '" + name + "' has been disconnected." );
     
   }
   
@@ -158,6 +164,5 @@ public class NfcReader implements Runnable {
     return terminal;
   }
   
-  
-  
+
 }

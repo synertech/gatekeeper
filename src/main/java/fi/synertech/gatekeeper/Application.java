@@ -14,14 +14,10 @@ public class Application {
     
     AccessManager accessManager = new AccessManager();
     
-    NfcReaderHub readerHub = NfcReaderHub.getInstance();
-    readerHub.start();
+    //////// Luodaan lukijat ///////
     
     NfcReader inReader = new NfcReader( "IN_READER" );
     NfcReader outReader = new NfcReader( "OUT_READER" );
-    
-    readerHub.connect( inReader );
-    readerHub.connect( outReader ); 
     
     inReader.onReading( event -> {
       if ( accessManager.hasAccess( event.rfid() ) ) {
@@ -35,6 +31,12 @@ public class Application {
       System.out.println( "welcome again..." );
     });
     
+    /////////////// Luodaan lukijoille hubi ja liitetään lukijat /////////
+    
+    NfcReaderHub hub = NfcReaderHub.getInstance();
+    
+    hub.connect( inReader );
+    hub.connect( outReader ); 
     
   }
   

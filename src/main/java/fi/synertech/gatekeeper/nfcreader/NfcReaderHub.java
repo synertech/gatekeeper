@@ -41,7 +41,10 @@ public class NfcReaderHub extends Thread {
   public static NfcReaderHub getInstance() {
     
     if ( hub == null ) {
+      
       hub = new NfcReaderHub();
+      hub.start();
+      
     }
     
     return hub;
@@ -74,7 +77,12 @@ public class NfcReaderHub extends Thread {
         readers.forEach( reader -> {
           if ( !reader.isConnected() ) {
             getTerminal().ifPresent( terminal -> {
-              new Thread( reader.connect( terminal ) ).start();
+              
+              reader.connect( terminal );
+              
+              Thread thread = new Thread( reader );
+              thread.start();
+              
             });
           } else if ( !terminalExists( reader.terminal() ) ) {
             reader.disconnect();
