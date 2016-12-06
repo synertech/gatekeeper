@@ -1,8 +1,7 @@
 
 package fi.synertech.gatekeeper;
 
-import fi.synertech.gatekeeper.nfcreader.NfcReader;
-import fi.synertech.gatekeeper.nfcreader.NfcReaderHub;
+import fi.synertech.gatekeeper.nfcreader.Gatekeeper;
 
 /**
  *
@@ -14,29 +13,23 @@ public class Application {
     
     AccessManager accessManager = new AccessManager();
     
-    //////// Luodaan lukijat ///////
+    Gatekeeper gatekeeper = new Gatekeeper();
     
-    NfcReader inReader = new NfcReader( "IN_READER" );
-    NfcReader outReader = new NfcReader( "OUT_READER" );
+    gatekeeper
+      .getInReader()
+      .onReading( event -> {
+        if ( accessManager.hasAccess( event.rfid() ) ) {
+          System.out.println( "Gate opening..." );
+        } else {
+          System.out.println( "You don't have a permission!" );
+        }
+      });
     
-    inReader.onReading( event -> {
-      if ( accessManager.hasAccess( event.rfid() ) ) {
-        System.out.println( "Gate opening..." );
-      } else {
-        System.out.println( "You don't have a permission!" );
-      }
-    });
-    
-    outReader.onReading( event -> {
-      System.out.println( "welcome again..." );
-    });
-    
-    /////////////// Luodaan lukijoille hubi ja liitetään lukijat /////////
-    
-    NfcReaderHub hub = NfcReaderHub.getInstance();
-    
-    hub.connect( inReader );
-    hub.connect( outReader ); 
+    gatekeeper
+      .getOutReader()
+      .onReading( event -> {
+        System.out.println( "welcome again..." );
+      });
     
   }
   
