@@ -74,12 +74,7 @@ public class NfcReaderHub extends Thread {
         readers.forEach( reader -> {
           if ( !reader.isConnected() ) {
             getTerminal().ifPresent( terminal -> {
-              
-              reader.connect( terminal );
-              
-              Thread thread = new Thread( reader );
-              thread.start();
-              
+              new Thread( reader.connect( terminal ) ).start();
             });
           } else if ( !terminalExists( reader.terminal() ) ) {
             reader.disconnect();

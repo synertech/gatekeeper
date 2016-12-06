@@ -1,5 +1,5 @@
 
-package fi.synertech.gatekeeper;
+package fi.synertech.gatekeeper.service;
 
 /**
  *

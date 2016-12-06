@@ -128,14 +128,17 @@ public class NfcReader implements Runnable {
    * Liittää lukijan.
    * 
    * @param terminal 
+   * @return  
    */
   
-  protected void connect( CardTerminal terminal ) {
+  protected NfcReader connect( CardTerminal terminal ) {
     
     this.connected = true;
     this.terminal = terminal;
     
     logger.info( "NFC-Reader '" + name + "' has been connected." );
+    
+    return this;
     
   }
   

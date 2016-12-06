@@ -1,7 +1,8 @@
 
 package fi.synertech.gatekeeper.nfcreader;
 
-import fi.synertech.gatekeeper.AccessManager;
+import fi.synertech.gatekeeper.service.AccessManager;
+import fi.synertech.gatekeeper.service.CheckpointService;
 
 /**
  *
@@ -19,9 +20,11 @@ public class Gatekeeper {
    * Konstruktori.
    * 
    * @param accessManager
+   * @param checkpointService
    */
   
-  public Gatekeeper( AccessManager accessManager ) {
+  public Gatekeeper( AccessManager accessManager, 
+                     CheckpointService checkpointService ) {
     
     this.accessManager = accessManager;
     
@@ -40,6 +43,7 @@ public class Gatekeeper {
   public void start() {
     
     hub.start();
+    
     hub.connect( inReader );
     hub.connect( outReader );
     
